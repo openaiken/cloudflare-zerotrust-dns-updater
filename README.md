@@ -14,6 +14,8 @@ The script has some error checking, logs to stderr, and outputs a simple "succes
 
 ### Notes
 
-The $acctID is your actual Account ID, not the Zone ID. It's a UUID. The $token is **not** your Global API key, it is an API _token_ that must  be configured with the permission **Zero Trust: Edit** for your account. $domainName is the A record that needs to be loaded into your CF ZT DNS configuration.
+- The $acctID is your actual Account ID, not the Zone ID. It's a UUID. The $token is **not** your Global API key, it is an API _token_ that must  be configured with the permission **Zero Trust: Edit** for your account. $domainName is the A record that needs to be loaded into your CF ZT DNS configuration.
 
-This script requires `curl`, `jq`, and whatever package your Linux distro provides the `dig` command in (for Arch it's just `bind`). Otherwise it pretty much uses regular bash syntax.
+- This script requires `curl`, `jq`, and whatever package your Linux distro provides the `dig` command in (for Arch it's just `bind`). Otherwise it pretty much uses regular bash syntax.
+
+- This script assumes use of DynDNS to reference your true External/WAN address. If you are using specifically a Cloudflare domain and DynDNS, you'll need to disable Proxy Mode for the record you're updating. If you wish to keep Proxy Mode enabled, then a different method of determining the WAN address (than getting the DNS answer) will be required. You can simply reimplement the `get_current_wan_address()` function in the bash source. One possible approach would be to use the output of `curl ifconfig.me`, where https://ifconfig.me is a free 3rd party utility for this purpose and others.
