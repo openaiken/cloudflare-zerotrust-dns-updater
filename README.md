@@ -16,4 +16,4 @@ The script has some error checking, logs to stderr, and outputs a simple "succes
 
 The $acctID is your actual Account ID, not the Zone ID. It's a UUID. The $token is **not** your Global API key, it is an API _token_ that must  be configured with the permission **Zero Trust: Edit** for your account. $domainName is the A record that needs to be loaded into your CF ZT DNS configuration.
 
-This script requires `curl` and `jq`. It mostly uses regular bash syntax. It does also utilize `dig` and some common core utilities.
+This script requires `curl`, `jq`, and whatever package your Linux distro provides the `dig` command in (for Arch it's just `bind`). Otherwise it pretty much uses regular bash syntax.
