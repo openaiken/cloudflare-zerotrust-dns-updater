@@ -1,7 +1,7 @@
 #!/bin/bash
 #04 Nov 2023
 #requires:
-#       curl jq
+#       curl, jq, bind (or whatever package your distro provides the `dig` command in)
 acctID=yourAcctIdHere
 token=yourTokenHereWithZeroTrustEditPermissions
 domainName=your.domain.name
