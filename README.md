@@ -10,7 +10,7 @@ I wrote this script to update that client address in "one click" in the event th
 
 The script queries the Cloudflare API to get all the DNS Gateway Locations in Zero Trust, and finds the one configured as default. It then reads the address currently set, queries DNS to see what your domain (presumably on DynDNS) currently resolves to, and compares them. If they are different (i.e. ZT needs to be updated), it queries the Cloudflare API again and sets the DNS Gateway Location network address to the new value from DNS.
 
-The script has some error checking, logs to stderr, and outputs a simple "success" or "failure" to stdout upon execution, to facilitate integration into some other automation. Personally I run this script on a Zabbix Server so I can monitor its routine success/failure.
+The script has some error checking, logs to stderr, and outputs JSON with a simple "success" or "failure" object to stdout upon execution, to facilitate integration into some other automation. Personally I run this script on a Zabbix Server (with stderr directed to /dev/null) so I can easily monitor its routine success/failure.
 
 ### Notes
 
