@@ -13,11 +13,11 @@ ENV_FILENAME="cloudflare_zerotrust_dns_update.env"
 
 # Print a Machine-Readable (JSON) object to stdout showing the execution status
 print_execution_status () {
-	# Was the API call successful or not?
+  # Was the API call successful or not?
   local successful=$1 # success|failure
-	# Did the address configured in Cloudflare ZT match the DNS record?
+  # Did the address configured in Cloudflare ZT match the DNS record?
   local matches=$2    # true|false
-	# Was there an issue with the execution of this script?
+  # Was there an issue with the execution of this script?
   local execIssue=$3  # true|false
   echo "{\"successful\": \"$successful\", \"matches\": $matches, \"execIssue\": $execIssue}"
 }
@@ -117,11 +117,11 @@ set_zt_gateway_location () {
   local name=$1
   local uuid=$2
   local addr=$3
-	# We have to prepare a JSON object to post to the API containing the changes we're making to the DNS location.
+  # We have to prepare a JSON object to post to the API containing the changes we're making to the DNS location.
   local object
   object=$(jq -M -n --arg k1 "$name" --arg k2 "$addr/32" \
     '{ "name": $k1, "networks": [ {"network": $k2} ] }')
-	# HTTP PUT to the API and store the JSON response 
+  # HTTP PUT to the API and store the JSON response 
   local response
   response=$(curl -s --request PUT \
     --resolve +api.cloudflare.com:443:"$API_ENDPOINT" \
@@ -139,8 +139,8 @@ set_zt_gateway_location () {
     exit 0
   elif [[ "$success" == "false" ]]; then
     print_execution_status "failure" false false
-		echo "ERROR: API call failed. Here's the full response:" >&2
-		echo "$response" | jq `.` >&2
+    echo "ERROR: API call failed. Here's the full response:" >&2
+    echo "$response" | jq `.` >&2
     exit 1
   else
     print_execution_status "failure" false true
@@ -151,13 +151,13 @@ set_zt_gateway_location () {
 
 # Get the IP address that the DNS Gateway's Source IP Address will be checked against, and set to, if needed.
 get_current_wan_address () {
-	# This is a simple DNS lookup, and it uses the first result, just in case there are multiple.
-	# A future enhancement could be support for an option to get the value returned from curling https://ifconfig.me.
+  # This is a simple DNS lookup, and it uses the first result, just in case there are multiple.
+  # A future enhancement could be support for an option to get the value returned from curling https://ifconfig.me.
   dig @"$DNS_SERVICE" +short "$domainName" | head -n 1
 }
 
 main () {
-	# Ensure the API endpoint we resolved looks somewhat like an IPv4 address.
+  # Ensure the API endpoint we resolved looks somewhat like an IPv4 address.
   if [[ ! $API_ENDPOINT =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(,[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)*$ ]]; then
     print_execution_status "failure" false true
     echo "ERROR: Didn't resolve the Cloudflare API endpoint to an IP address; got: $API_ENDPOINT . Exiting." >&2
@@ -169,11 +169,11 @@ main () {
   local selectedLocation=""
   local listLength
   listLength=$(echo "$locationList" | jq '.result | length')
-	# Iterate through the Locations list, looking for the one we want to set.
+  # Iterate through the Locations list, looking for the one we want to set.
   for (( i=0; i<listLength; i++ )); do
     local rawLocation
     rawLocation=$(echo "$locationList" | jq ".result[$i]")
-		# If the Location Name variable was set, check for a matching name. Else, check for the location set as Default.
+    # If the Location Name variable was set, check for a matching name. Else, check for the location set as Default.
     if [[ -n "$locationName" ]]; then
       local currentName
       currentName=$(echo "$rawLocation" | jq -r '.name')
@@ -207,20 +207,20 @@ main () {
   newAddress=$(get_current_wan_address)
 
   if [[ "$newAddress/32" == "$oldAddress" ]]; then
-		# The API call was successful, and the addresses matched, so no action required. Perfect.
+    # The API call was successful, and the addresses matched, so no action required. Perfect.
     print_execution_status "success" true false
     echo "INFO: IP address configured matches the current DNS/A record for the domain. Exiting." >&2
     exit 0
   fi
 
   if [[ -z "$locName" || -z "$locationID" || -z "$newAddress" ]]; then
-		# If for any reason, the location name/ID haven't been figured out, or there was an issue getting the new address, exit now.
+    # If for any reason, the location name/ID haven't been figured out, or there was an issue getting the new address, exit now.
     print_execution_status "failure" false true
     echo "ERROR: Missing one or more of the location name (\"$locName\"), location UUID (\"$locationID\"), and/or address (\"$newAddress\")" >&2
     exit 1
   fi
 
-	# The script exits before this point if the location's source address doesn't need to be updated.
+  # The script exits before this point if the location's source address doesn't need to be updated.
   set_zt_gateway_location "$locName" "$locationID" "$newAddress"
 }
 
